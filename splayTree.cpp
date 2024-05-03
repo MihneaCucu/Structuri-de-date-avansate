@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <chrono>
 using namespace std;
 ofstream fout("output.txt");
 class nodABC{
@@ -68,30 +69,36 @@ public:
 };
 void ABC::inserare(nodABC* nod){
     nodABC* par = radacina;
-    while(true){
-        if(nod->valoare <= par->valoare){
-            if(par->fiu_stanga == 0){
-                par->fiu_stanga = nod;
-                nod->parinte = par;
-                break;
+    if(par == 0){
+        radacina = nod;
+    }
+    else
+    {
+        while(true){
+            if(nod->valoare <= par->valoare){
+                if(par->fiu_stanga == 0){
+                    par->fiu_stanga = nod;
+                    nod->parinte = par;
+                    break;
+                }
+                else
+                {
+                    par = par->fiu_stanga;
+                }
             }
             else
             {
-                par = par->fiu_stanga;
-            }
-        }
-        else
-        {
-            if(par->fiu_dreapta == 0){
-                par->fiu_dreapta = nod;
-                nod->parinte = par;
-                break;
-            }
-            else
-            {
-                par = par->fiu_dreapta;
-            }
+                if(par->fiu_dreapta == 0){
+                    par->fiu_dreapta = nod;
+                    nod->parinte = par;
+                    break;
+                }
+                else
+                {
+                    par = par->fiu_dreapta;
+                }
 
+            }
         }
     }
 }
@@ -248,30 +255,32 @@ void ABC::stergere(nodABC* nod){
     else
     {
         if(nod->fiu_stanga == 0){
-            muta_nod(nod, nod->fiu_dreapta);
+            nodABC* nod_aux = nod->fiu_dreapta;
+            muta_nod(nod, nod_aux);
             if(nod == radacina){
-                radacina = nod->fiu_dreapta;
+                radacina = nod_aux;
             }
         }
         else
         {
             if(nod->fiu_dreapta == 0){
-
-                muta_nod(nod, nod->fiu_stanga);
+                nodABC* nod_aux = nod->fiu_stanga;
+                muta_nod(nod, nod_aux);
                 if(nod == radacina){
-                    radacina = nod->fiu_stanga;
+                    radacina = nod_aux;
                 }
             }
             else
             {
                 nodABC* suc = succesor(nod);
                 if(nod->fiu_dreapta == suc){
-                    muta_nod(nod, nod->fiu_dreapta);
+                    muta_nod(nod, suc);
                     if(nod == radacina){
-                        radacina = nod->fiu_dreapta;
+                        radacina = suc;
                     }
-                    if(nod->fiu_dreapta != 0)
-                        nod->fiu_dreapta->fiu_stanga = nod->fiu_stanga;
+                    if(nod->fiu_dreapta != 0){
+                        suc->fiu_stanga = nod->fiu_stanga;
+                    }
                 }
                 else
                 {
@@ -501,7 +510,7 @@ int main()
     int prev_size = 0;
     ABC arbore;
     fin >> k;
-    
+
     auto start = std::chrono::high_resolution_clock::now();
     for(int contor = 0; contor < k; contor++){
         fin >> keyword;
@@ -562,4 +571,3 @@ int main()
     cout << "Time taken: " << duration.count() << " ms" << std::endl;
 
 }
-
